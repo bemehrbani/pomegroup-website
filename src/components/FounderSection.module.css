@@ -1,0 +1,128 @@
+.section {
+  background: var(--color-surface);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.greeting {
+  color: var(--color-primary);
+  margin-bottom: 20px;
+}
+
+.bio {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+  max-width: 560px;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.skill {
+  padding: 8px 18px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.trackRecord {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  box-shadow: var(--shadow-md);
+}
+
+.trackTitle {
+  color: var(--color-primary);
+  margin-bottom: 28px;
+  font-size: 1.2rem;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-left: 2px solid var(--color-border);
+  padding-left: 20px;
+  position: relative;
+}
+
+.timelineItem:first-child {
+  padding-top: 0;
+}
+
+.timelineItem:last-child {
+  padding-bottom: 0;
+}
+
+.timelineDot {
+  position: absolute;
+  left: -6px;
+  top: 20px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  border: 2px solid var(--color-white);
+}
+
+.timelineItem:first-child .timelineDot {
+  top: 4px;
+}
+
+.timelineContent {
+  flex: 1;
+}
+
+.timelineHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+
+.timelineName {
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.timelineRole {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.timelineDesc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
