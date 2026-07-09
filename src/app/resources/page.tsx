@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { BookOpen, Code, ShieldCheck, Mail, ArrowLeft, Download, CheckCircle, Clock, Sparkles, ArrowRight } from 'lucide-react';
+import { BookOpen, Code, ShieldCheck, Mail, ArrowLeft, Download, CheckCircle, Clock, Sparkles, ArrowRight, Scale } from 'lucide-react';
 import styles from './page.module.css';
 
 interface Playbook {
@@ -202,20 +202,43 @@ export default function ResourcesPage() {
 
               {/* Playbooks Grid */}
               <div className={styles.grid}>
-                {/* Interactive Tool Card [NEW] */}
-                <div className={styles.card} style={{ border: '2px solid var(--color-primary)', background: 'rgba(45, 43, 107, 0.02)' }}>
-                  <div className={styles.cardHeader}>
-                    <div className={styles.iconWrapper} style={{ background: 'rgba(245, 166, 35, 0.1)', color: 'var(--color-secondary-dark)' }}>
-                      <Sparkles size={24} />
+                {/* Interactive Tool Card: Funding Finder */}
+                <div className={styles.card} style={{ border: '2px solid var(--color-primary)', background: 'rgba(45, 43, 107, 0.02)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div className={styles.cardHeader}>
+                      <div className={styles.iconWrapper} style={{ background: 'rgba(245, 166, 35, 0.1)', color: 'var(--color-secondary-dark)' }}>
+                        <Sparkles size={24} />
+                      </div>
+                      <span className="tag" style={{ background: 'var(--color-secondary)', color: 'var(--color-primary-dark)', borderColor: 'var(--color-secondary)' }}>Interactive Tool</span>
                     </div>
-                    <span className="tag" style={{ background: 'var(--color-secondary)', color: 'var(--color-primary-dark)', borderColor: 'var(--color-secondary)' }}>Interactive Tool</span>
+                    <h2 className={styles.cardTitle}>EU Funding Finder &amp; AI Matcher</h2>
+                    <p className={styles.cardSummary}>
+                      Search the official European Commission database for active grants. Input your startup project concept to receive a custom AI eligibility alignment report.
+                    </p>
                   </div>
-                  <h2 className={styles.cardTitle}>EU Funding Finder & AI Matcher</h2>
-                  <p className={styles.cardSummary}>
-                    Search the official European Commission database for active grants. Input your startup project concept to receive a custom AI eligibility alignment report.
-                  </p>
-                  <div className={styles.cardFooter}>
+                  <div className={styles.cardFooter} style={{ marginTop: 20 }}>
                     <a href="/resources/funding-finder" className="btn btn-primary" style={{ padding: '8px 20px', fontSize: '0.85rem' }}>
+                      Launch Tool <ArrowRight size={14} />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Interactive Tool Card: Equity Calculator */}
+                <div className={styles.card} style={{ border: '2px solid var(--color-primary)', background: 'rgba(45, 43, 107, 0.02)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div className={styles.cardHeader}>
+                      <div className={styles.iconWrapper} style={{ background: 'rgba(245, 166, 35, 0.1)', color: 'var(--color-secondary-dark)' }}>
+                        <Scale size={24} />
+                      </div>
+                      <span className="tag" style={{ background: 'var(--color-secondary)', color: 'var(--color-primary-dark)', borderColor: 'var(--color-secondary)' }}>Interactive Tool</span>
+                    </div>
+                    <h2 className={styles.cardTitle}>Co-Founder Equity Split Calculator</h2>
+                    <p className={styles.cardSummary}>
+                      Determine a fair, vesting-backed equity split between business and technical co-founders. Analyze commitments, capital, IP, and expertise objectively.
+                    </p>
+                  </div>
+                  <div className={styles.cardFooter} style={{ marginTop: 20 }}>
+                    <a href="/resources/equity-calculator" className="btn btn-primary" style={{ padding: '8px 20px', fontSize: '0.85rem' }}>
                       Launch Tool <ArrowRight size={14} />
                     </a>
                   </div>

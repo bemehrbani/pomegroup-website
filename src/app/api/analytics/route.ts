@@ -55,17 +55,14 @@ export async function GET() {
     const clientSecrets = JSON.parse(fs.readFileSync(credentialsPath, 'utf8')).installed;
     const token = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
 
-    const oauth2Client = new OAuth2Client(
-      clientSecrets.client_id,
-      clientSecrets.client_secret,
-      clientSecrets.redirect_uris[0]
-    );
-
-    oauth2Client.setCredentials(token);
-
-    // Initialize GA4 Data API client using OAuth2 client
+    // Initialize GA4 Data API client using unified OAuth credentials
     const client = new BetaAnalyticsDataClient({
-      auth: oauth2Client as any
+      credentials: {
+        type: 'authorized_user',
+        client_id: clientSecrets.client_id,
+        client_secret: clientSecrets.client_secret,
+        refresh_token: token.refresh_token,
+      }
     });
 
     const propertyString = `properties/${GA4_PROPERTY_ID}`;
