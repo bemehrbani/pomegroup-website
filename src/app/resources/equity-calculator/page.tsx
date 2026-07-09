@@ -15,42 +15,59 @@ import {
   User, 
   Lock, 
   HelpCircle,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  PieChart
 } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function EquityCalculatorPage() {
   const router = useRouter();
+  const [modelMode, setModelMode] = useState<'slicing-pie' | 'wasserman'>('slicing-pie');
   const [step, setStep] = useState(1);
 
-  // Founder A (Business / Domain Expert)
-  const [founderA, setFounderA] = useState({
+  // ----------------------------------------------------
+  // MODEL 1: SLICING PIE (DYNAMIC EQUITY) STATE
+  // ----------------------------------------------------
+  const [pieA, setPieA] = useState({
     name: 'Founder A (Business)',
-    commitment: '1.0', // Full-time
-    capital: 5000,
-    ip: '1', // Basic idea/mockups
-    domainExpertise: '3', // Expert
-    roleWeight: '0.4', // Business execution focus
+    hours: 120, // Hours worked per month
+    rate: 50,   // Fair market hourly rate in €
+    cash: 5000,  // Cash invested
   });
 
-  // Founder B (Technical / Developer)
-  const [founderB, setFounderB] = useState({
+  const [pieB, setPieB] = useState({
     name: 'Founder B (Technical)',
-    commitment: '1.0', // Full-time
-    capital: 0,
-    ip: '0', // None
-    domainExpertise: '1', // Low
-    roleWeight: '0.6', // Engineering execution focus
+    hours: 160,
+    rate: 65,
+    cash: 500,
   });
 
-  // Results State
+  // ----------------------------------------------------
+  // MODEL 2: WASSERMAN / FOUNDERCENTRIC (FIXED POINTS) STATE
+  // ----------------------------------------------------
+  const [pointsA, setPointsA] = useState({
+    name: 'Founder A (Business)',
+    idea: 4,      // 1-5 rating
+    commitment: 3,
+    execution: 2,
+    domain: 5,
+    growth: 5,
+  });
+
+  const [pointsB, setPointsB] = useState({
+    name: 'Founder B (Technical)',
+    idea: 1,
+    commitment: 5,
+    execution: 5,
+    domain: 2,
+    growth: 1,
+  });
+
+  // Calculated Outputs
   const [splitA, setSplitA] = useState(50);
   const [splitB, setSplitB] = useState(50);
-  const [pomegroupAlternative, setPomegroupAlternative] = useState({
-    expertSplit: 65,
-    studioSplit: 35,
-  });
-
+  
   // Vesting Timeline States
   const [vestingYears, setVestingYears] = useState(4);
   const [cliffMonths, setCliffMonths] = useState(12);
@@ -62,60 +79,68 @@ export default function EquityCalculatorPage() {
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Calculate split based on input attributes
-  useEffect(() => {
-    // 1. Base values from commitment (weight 40%)
-    const commA = parseFloat(founderA.commitment);
-    const commB = parseFloat(founderB.commitment);
-    const commSum = commA + commB || 1;
-    const scoreCommA = (commA / commSum) * 40;
-    const scoreCommB = (commB / commSum) * 40;
+  // Calculate Slicing Pie Split
+  const calculateSlicingPie = () => {
+    // Slicing Pie Math:
+    // Non-Cash Slices = Time worked * Hourly rate * 2 (Non-cash multiplier)
+    // Cash Slices = Cash contributed * 4 (Cash multiplier)
+    const nonCashA = pieA.hours * pieA.rate * 2;
+    const cashA = pieA.cash * 4;
+    const slicesA = nonCashA + cashA;
 
-    // 2. Capital Contributions (weight 15%)
-    const capA = founderA.capital;
-    const capB = founderB.capital;
-    const capSum = capA + capB || 1;
-    const scoreCapA = capSum > 1 ? (capA / capSum) * 15 : 7.5;
-    const scoreCapB = capSum > 1 ? (capB / capSum) * 15 : 7.5;
+    const nonCashB = pieB.hours * pieB.rate * 2;
+    const cashB = pieB.cash * 4;
+    const slicesB = nonCashB + cashB;
 
-    // 3. Intellectual Property (weight 15%)
-    const ipValA = parseInt(founderA.ip) * 5; // 0 to 15 max
-    const ipValB = parseInt(founderB.ip) * 5;
-    const ipSum = ipValA + ipValB || 1;
-    const scoreIpA = (ipValA / ipSum) * 15;
-    const scoreIpB = (ipValB / ipSum) * 15;
-
-    // 4. Domain Expertise & Network (weight 15%)
-    const domValA = parseInt(founderA.domainExpertise) * 5; // 0 to 15 max
-    const domValB = parseInt(founderB.domainExpertise) * 5;
-    const domSum = domValA + domValB || 1;
-    const scoreDomA = (domValA / domSum) * 15;
-    const scoreDomB = (domValB / domSum) * 15;
-
-    // 5. Role Weight Execution Value (weight 15%)
-    const roleA = parseFloat(founderA.roleWeight);
-    const roleB = parseFloat(founderB.roleWeight);
-    const roleSum = roleA + roleB || 1;
-    const scoreRoleA = (roleA / roleSum) * 15;
-    const scoreRoleB = (roleB / roleSum) * 15;
-
-    // Aggregate Scores
-    const totalA = scoreCommA + scoreCapA + scoreIpA + scoreDomA + scoreRoleA;
-    const totalB = scoreCommB + scoreCapB + scoreIpB + scoreDomB + scoreRoleB;
-    const totalSum = totalA + totalB || 1;
-
-    const percentA = Math.round((totalA / totalSum) * 100);
+    const totalSlices = slicesA + slicesB || 1;
+    const percentA = Math.round((slicesA / totalSlices) * 100);
     const percentB = 100 - percentA;
 
-    setSplitA(percentA);
-    setSplitB(percentB);
+    return { percentA, percentB, slicesA, slicesB };
+  };
 
-    // Calculate Pomegroup Studio model alternative (Studio takes 35% standard for tech execution, founder keeps 65%)
-    setPomegroupAlternative({
-      expertSplit: 65,
-      studioSplit: 35,
-    });
-  }, [founderA, founderB]);
+  // Calculate Wasserman Point Split
+  const calculateWasserman = () => {
+    // Wasserman Framework Weights:
+    // Idea & Vision (10%)
+    // Commitment & Opportunity Cost (30%)
+    // Execution & Tech Architecture (30%)
+    // Domain Expertise & IP (15%)
+    // BizDev & Go-to-Market (15%)
+    const scoreA = 
+      pointsA.idea * 0.10 + 
+      pointsA.commitment * 0.30 + 
+      pointsA.execution * 0.30 + 
+      pointsA.domain * 0.15 + 
+      pointsA.growth * 0.15;
+
+    const scoreB = 
+      pointsB.idea * 0.10 + 
+      pointsB.commitment * 0.30 + 
+      pointsB.execution * 0.30 + 
+      pointsB.domain * 0.15 + 
+      pointsB.growth * 0.15;
+
+    const totalScore = scoreA + scoreB || 1;
+    const percentA = Math.round((scoreA / totalScore) * 100);
+    const percentB = 100 - percentA;
+
+    return { percentA, percentB };
+  };
+
+  // Update Split Outputs on value changes
+  useEffect(() => {
+    if (modelMode === 'slicing-pie') {
+      const { percentA, percentB } = calculateSlicingPie();
+      setSplitA(percentA);
+      setSplitB(percentB);
+    } else {
+      const { percentA, percentB } = calculateWasserman();
+      setSplitA(percentA);
+      setSplitB(percentB);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelMode, pieA, pieB, pointsA, pointsB]);
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,10 +155,10 @@ export default function EquityCalculatorPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          name: founderA.name,
-          idea: `Venture Concept: ${concept} | Calculated Equity: ${splitA}% Business / ${splitB}% Technical | Vesting: ${vestingYears}yr with ${cliffMonths}mo cliff`,
+          name: modelMode === 'slicing-pie' ? pieA.name : pointsA.name,
+          idea: `Venture Concept: ${concept} | Calculator Mode: ${modelMode.toUpperCase()} | Calculated Split: ${splitA}% / ${splitB}% | Vesting: ${vestingYears}yr with ${cliffMonths}mo cliff`,
           role: 'Equity Calculator Lead',
-          traction: 'Calculated co-founder equity splits'
+          traction: 'Calculated co-founder equity splits using established models'
         }),
       });
 
@@ -162,9 +187,27 @@ export default function EquityCalculatorPage() {
             <div className="section-label">Interactive Tool</div>
             <h1>Co-Founder Equity Split Calculator</h1>
             <p>
-              Avoid co-founder disputes by evaluating your contributions objectively. 
-              Determine a fair, vesting-backed equity split using standard startup frameworks.
+              Evaluate your co-founder contributions objectively. Toggle between the dynamic **Slicing Pie** model 
+              or the weighted **HBS Wasserman Points** framework to determine a fair split.
             </p>
+          </div>
+
+          {/* Model Toggle Selector */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 40 }}>
+            <button
+              onClick={() => { setModelMode('slicing-pie'); setStep(1); }}
+              className={`btn ${modelMode === 'slicing-pie' ? 'btn-primary' : 'btn-outline'}`}
+              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            >
+              <TrendingUp size={16} /> Slicing Pie Model (Dynamic)
+            </button>
+            <button
+              onClick={() => { setModelMode('wasserman'); setStep(1); }}
+              className={`btn ${modelMode === 'wasserman' ? 'btn-primary' : 'btn-outline'}`}
+              style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+            >
+              <Scale size={16} /> HBS Wasserman Model (Fixed)
+            </button>
           </div>
 
           <div className={styles.card}>
@@ -173,250 +216,360 @@ export default function EquityCalculatorPage() {
               <div className={styles.stepLineActive} style={{ width: `${(step - 1) * 50}%` }} />
               <div className={`${styles.stepDot} ${step >= 1 ? (step > 1 ? styles.stepDotCompleted : styles.stepDotActive) : ''}`}>
                 1
-                <span className={styles.stepLabel}>Commitment</span>
+                <span className={styles.stepLabel}>Inputs</span>
               </div>
               <div className={`${styles.stepDot} ${step >= 2 ? (step > 2 ? styles.stepDotCompleted : styles.stepDotActive) : ''}`}>
                 2
-                <span className={styles.stepLabel}>Contributions</span>
+                <span className={styles.stepLabel}>Results</span>
               </div>
               <div className={`${styles.stepDot} ${step >= 3 ? styles.stepDotActive : ''}`}>
                 3
-                <span className={styles.stepLabel}>Results</span>
+                <span className={styles.stepLabel}>Vesting</span>
               </div>
             </div>
 
-            {/* STEP 1: COMMITMENT & CAPITAL */}
+            {/* STEP 1: INPUTS FORM */}
             {step === 1 && (
               <div>
                 <h2 className={styles.sectionTitle}>
-                  <Clock size={22} style={{ color: 'var(--color-primary)' }} />
-                  Step 1: Commitment &amp; Risk Valuation
+                  {modelMode === 'slicing-pie' ? (
+                    <>
+                      <Coins size={22} style={{ color: 'var(--color-primary)' }} />
+                      Slicing Pie Contributions (Monthly Estimate)
+                    </>
+                  ) : (
+                    <>
+                      <Scale size={22} style={{ color: 'var(--color-primary)' }} />
+                      HBS Wasserman Points Framework
+                    </>
+                  )}
                 </h2>
 
-                <div className={styles.grid}>
-                  {/* Founder A Column */}
-                  <div className={`${styles.founderColumn} ${styles.founderColumnActive}`}>
-                    <h3>Founder A (Business / Sales)</h3>
-                    
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fa-name">Founder Name or Role</label>
-                      <input 
-                        type="text" 
-                        id="fa-name"
-                        className={styles.textInput}
-                        value={founderA.name}
-                        onChange={(e) => setFounderA({ ...founderA, name: e.target.value })}
-                      />
+                {modelMode === 'slicing-pie' ? (
+                  /* SLICING PIE INPUTS */
+                  <div className={styles.grid}>
+                    {/* Founder A Column */}
+                    <div className={`${styles.founderColumn} ${styles.founderColumnActive}`}>
+                      <h3>{pieA.name}</h3>
+                      
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pie-name">Founder Role / Name</label>
+                        <input 
+                          type="text" 
+                          id="fa-pie-name"
+                          className={styles.textInput}
+                          value={pieA.name}
+                          onChange={(e) => setPieA({ ...pieA, name: e.target.value })}
+                        />
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pie-hours">Monthly Hours Contributed</label>
+                        <div className={styles.rangeSliderContainer}>
+                          <input 
+                            type="range" 
+                            id="fa-pie-hours"
+                            min="10" 
+                            max="200" 
+                            step="10"
+                            className={styles.slider}
+                            value={pieA.hours}
+                            onChange={(e) => setPieA({ ...pieA, hours: parseInt(e.target.value) })}
+                          />
+                          <span className={styles.sliderValue}>{pieA.hours} hrs</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pie-rate">Fair Market Hourly Rate (€/hr)</label>
+                        <div className={styles.rangeSliderContainer}>
+                          <input 
+                            type="range" 
+                            id="fa-pie-rate"
+                            min="20" 
+                            max="150" 
+                            step="5"
+                            className={styles.slider}
+                            value={pieA.rate}
+                            onChange={(e) => setPieA({ ...pieA, rate: parseInt(e.target.value) })}
+                          />
+                          <span className={styles.sliderValue}>€{pieA.rate}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pie-cash">Out-of-Pocket Cash Contributed (€)</label>
+                        <input 
+                          type="number" 
+                          id="fa-pie-cash"
+                          className={styles.textInput}
+                          min="0"
+                          step="100"
+                          value={pieA.cash}
+                          onChange={(e) => setPieA({ ...pieA, cash: Math.max(0, parseInt(e.target.value) || 0) })}
+                        />
+                      </div>
                     </div>
 
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fa-commitment">Time Commitment</label>
-                      <select 
-                        id="fa-commitment"
-                        className={styles.selectInput}
-                        value={founderA.commitment}
-                        onChange={(e) => setFounderA({ ...founderA, commitment: e.target.value })}
-                      >
-                        <option value="1.0">Full-time (100% focused)</option>
-                        <option value="0.5">Part-time (Transitioning / Nights)</option>
-                        <option value="0.2">Advisor / Strategic Ad-hoc</option>
-                      </select>
-                    </div>
+                    {/* Founder B Column */}
+                    <div className={styles.founderColumn}>
+                      <h3>{pieB.name}</h3>
+                      
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pie-name">Founder Role / Name</label>
+                        <input 
+                          type="text" 
+                          id="fb-pie-name"
+                          className={styles.textInput}
+                          value={pieB.name}
+                          onChange={(e) => setPieB({ ...pieB, name: e.target.value })}
+                        />
+                      </div>
 
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fa-capital">Initial Capital Contributed (€)</label>
-                      <input 
-                        type="number" 
-                        id="fa-capital"
-                        className={styles.textInput}
-                        min="0"
-                        step="500"
-                        value={founderA.capital}
-                        onChange={(e) => setFounderA({ ...founderA, capital: Math.max(0, parseInt(e.target.value) || 0) })}
-                      />
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pie-hours">Monthly Hours Contributed</label>
+                        <div className={styles.rangeSliderContainer}>
+                          <input 
+                            type="range" 
+                            id="fb-pie-hours"
+                            min="10" 
+                            max="200" 
+                            step="10"
+                            className={styles.slider}
+                            value={pieB.hours}
+                            onChange={(e) => setPieB({ ...pieB, hours: parseInt(e.target.value) })}
+                          />
+                          <span className={styles.sliderValue}>{pieB.hours} hrs</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pie-rate">Fair Market Hourly Rate (€/hr)</label>
+                        <div className={styles.rangeSliderContainer}>
+                          <input 
+                            type="range" 
+                            id="fb-pie-rate"
+                            min="20" 
+                            max="150" 
+                            step="5"
+                            className={styles.slider}
+                            value={pieB.rate}
+                            onChange={(e) => setPieB({ ...pieB, rate: parseInt(e.target.value) })}
+                          />
+                          <span className={styles.sliderValue}>€{pieB.rate}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pie-cash">Out-of-Pocket Cash Contributed (€)</label>
+                        <input 
+                          type="number" 
+                          id="fb-pie-cash"
+                          className={styles.textInput}
+                          min="0"
+                          step="100"
+                          value={pieB.cash}
+                          onChange={(e) => setPieB({ ...pieB, cash: Math.max(0, parseInt(e.target.value) || 0) })}
+                        />
+                      </div>
                     </div>
                   </div>
+                ) : (
+                  /* WASSERMAN FIXED POINTS INPUTS */
+                  <div className={styles.grid}>
+                    {/* Founder A Column */}
+                    <div className={`${styles.founderColumn} ${styles.founderColumnActive}`}>
+                      <h3>{pointsA.name}</h3>
 
-                  {/* Founder B Column */}
-                  <div className={styles.founderColumn}>
-                    <h3>Founder B (Engineering / Technical)</h3>
-                    
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fb-name">Founder Name or Role</label>
-                      <input 
-                        type="text" 
-                        id="fb-name"
-                        className={styles.textInput}
-                        value={founderB.name}
-                        onChange={(e) => setFounderB({ ...founderB, name: e.target.value })}
-                      />
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pt-name">Founder Role / Name</label>
+                        <input 
+                          type="text" 
+                          id="fa-pt-name"
+                          className={styles.textInput}
+                          value={pointsA.name}
+                          onChange={(e) => setPointsA({ ...pointsA, name: e.target.value })}
+                        />
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pt-idea">Idea Origination &amp; Research (1–5)</label>
+                        <select 
+                          id="fa-pt-idea"
+                          className={styles.selectInput}
+                          value={pointsA.idea}
+                          onChange={(e) => setPointsA({ ...pointsA, idea: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Minimal input</option>
+                          <option value="3">3 - Standard validation</option>
+                          <option value="5">5 - Developed core IP / patents</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pt-comm">Time Commitment &amp; Risk (1–5)</label>
+                        <select 
+                          id="fa-pt-comm"
+                          className={styles.selectInput}
+                          value={pointsA.commitment}
+                          onChange={(e) => setPointsA({ ...pointsA, commitment: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Part-time / Nights</option>
+                          <option value="3">3 - Transitioning to full-time</option>
+                          <option value="5">5 - Full-time / Resigned from high-paying role</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pt-exec">Execution &amp; Technical Skill (1–5)</label>
+                        <select 
+                          id="fa-pt-exec"
+                          className={styles.selectInput}
+                          value={pointsA.execution}
+                          onChange={(e) => setPointsA({ ...pointsA, execution: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Supporting role</option>
+                          <option value="3">3 - Intermediate management</option>
+                          <option value="5">5 - Core builder / CTO architect</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pt-domain">Domain Expertise &amp; Warm Network (1–5)</label>
+                        <select 
+                          id="fa-pt-domain"
+                          className={styles.selectInput}
+                          value={pointsA.domain}
+                          onChange={(e) => setPointsA({ ...pointsA, domain: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - General industry observer</option>
+                          <option value="3">3 - 5+ years experience in domain</option>
+                          <option value="5">5 - 10+ years expert with active customer contacts</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fa-pt-growth">Sales &amp; Business Growth (1–5)</label>
+                        <select 
+                          id="fa-pt-growth"
+                          className={styles.selectInput}
+                          value={pointsA.growth}
+                          onChange={(e) => setPointsA({ ...pointsA, growth: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Ad-hoc support</option>
+                          <option value="3">3 - Standard operations</option>
+                          <option value="5">5 - Main driver of sales &amp; funding</option>
+                        </select>
+                      </div>
                     </div>
 
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fb-commitment">Time Commitment</label>
-                      <select 
-                        id="fb-commitment"
-                        className={styles.selectInput}
-                        value={founderB.commitment}
-                        onChange={(e) => setFounderB({ ...founderB, commitment: e.target.value })}
-                      >
-                        <option value="1.0">Full-time (100% focused)</option>
-                        <option value="0.5">Part-time (Transitioning / Nights)</option>
-                        <option value="0.2">Advisor / Strategic Ad-hoc</option>
-                      </select>
-                    </div>
+                    {/* Founder B Column */}
+                    <div className={styles.founderColumn}>
+                      <h3>{pointsB.name}</h3>
 
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fb-capital">Initial Capital Contributed (€)</label>
-                      <input 
-                        type="number" 
-                        id="fb-capital"
-                        className={styles.textInput}
-                        min="0"
-                        step="500"
-                        value={founderB.capital}
-                        onChange={(e) => setFounderB({ ...founderB, capital: Math.max(0, parseInt(e.target.value) || 0) })}
-                      />
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pt-name">Founder Role / Name</label>
+                        <input 
+                          type="text" 
+                          id="fb-pt-name"
+                          className={styles.textInput}
+                          value={pointsB.name}
+                          onChange={(e) => setPointsB({ ...pointsB, name: e.target.value })}
+                        />
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pt-idea">Idea Origination &amp; Research (1–5)</label>
+                        <select 
+                          id="fb-pt-idea"
+                          className={styles.selectInput}
+                          value={pointsB.idea}
+                          onChange={(e) => setPointsB({ ...pointsB, idea: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Minimal input</option>
+                          <option value="3">3 - Standard validation</option>
+                          <option value="5">5 - Developed core IP / patents</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pt-comm">Time Commitment &amp; Risk (1–5)</label>
+                        <select 
+                          id="fb-pt-comm"
+                          className={styles.selectInput}
+                          value={pointsB.commitment}
+                          onChange={(e) => setPointsB({ ...pointsB, commitment: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Part-time / Nights</option>
+                          <option value="3">3 - Transitioning to full-time</option>
+                          <option value="5">5 - Full-time / Resigned from high-paying role</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pt-exec">Execution &amp; Technical Skill (1–5)</label>
+                        <select 
+                          id="fb-pt-exec"
+                          className={styles.selectInput}
+                          value={pointsB.execution}
+                          onChange={(e) => setPointsB({ ...pointsB, execution: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Supporting role</option>
+                          <option value="3">3 - Intermediate management</option>
+                          <option value="5">5 - Core builder / CTO architect</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pt-domain">Domain Expertise &amp; Warm Network (1–5)</label>
+                        <select 
+                          id="fb-pt-domain"
+                          className={styles.selectInput}
+                          value={pointsB.domain}
+                          onChange={(e) => setPointsB({ ...pointsB, domain: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - General industry observer</option>
+                          <option value="3">3 - 5+ years experience in domain</option>
+                          <option value="5">5 - 10+ years expert with active customer contacts</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.fieldGroup}>
+                        <label htmlFor="fb-pt-growth">Sales &amp; Business Growth (1–5)</label>
+                        <select 
+                          id="fb-pt-growth"
+                          className={styles.selectInput}
+                          value={pointsB.growth}
+                          onChange={(e) => setPointsB({ ...pointsB, growth: parseInt(e.target.value) })}
+                        >
+                          <option value="1">1 - Ad-hoc support</option>
+                          <option value="3">3 - Standard operations</option>
+                          <option value="5">5 - Main driver of sales &amp; funding</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className={styles.actionBar}>
                   <div />
                   <button onClick={() => setStep(2)} className="btn btn-primary">
-                    Next: Contributions <ArrowRight size={16} />
+                    Next: View Split Result <ArrowRight size={16} />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 2: CONTRIBUTIONS & ROLES */}
+            {/* STEP 2: CALCULATED RESULTS */}
             {step === 2 && (
               <div>
                 <h2 className={styles.sectionTitle}>
-                  <Scale size={22} style={{ color: 'var(--color-primary)' }} />
-                  Step 2: Intellectual Property, Network &amp; Domain Expertise
-                </h2>
-
-                <div className={styles.grid}>
-                  {/* Founder A Column */}
-                  <div className={`${styles.founderColumn} ${styles.founderColumnActive}`}>
-                    <h3>{founderA.name}</h3>
-
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fa-ip">Prior Intellectual Property</label>
-                      <select 
-                        id="fa-ip"
-                        className={styles.selectInput}
-                        value={founderA.ip}
-                        onChange={(e) => setFounderA({ ...founderA, ip: e.target.value })}
-                      >
-                        <option value="0">None (Just starting out)</option>
-                        <option value="1">Basic idea / market check mockups</option>
-                        <option value="2">Pre-existing proprietary templates / lists</option>
-                        <option value="3">Patented technology / proprietary algorithms</option>
-                      </select>
-                    </div>
-
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fa-domain">Domain Expertise &amp; Warm Network</label>
-                      <select 
-                        id="fa-domain"
-                        className={styles.selectInput}
-                        value={founderA.domainExpertise}
-                        onChange={(e) => setFounderA({ ...founderA, domainExpertise: e.target.value })}
-                      >
-                        <option value="1">General industry observer</option>
-                        <option value="2">5+ years experience in domain</option>
-                        <option value="3">10+ years expert with active customer network</option>
-                      </select>
-                    </div>
-
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fa-role">Expected Execution Weight</label>
-                      <select 
-                        id="fa-role"
-                        className={styles.selectInput}
-                        value={founderA.roleWeight}
-                        onChange={(e) => setFounderA({ ...founderA, roleWeight: e.target.value })}
-                      >
-                        <option value="0.3">Lower weight (Supporting operational tasks)</option>
-                        <option value="0.5">Medium weight (Handles sales, finance, operations)</option>
-                        <option value="0.7">High weight (Core driver of company growth)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Founder B Column */}
-                  <div className={styles.founderColumn}>
-                    <h3>{founderB.name}</h3>
-
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fb-ip">Prior Intellectual Property</label>
-                      <select 
-                        id="fb-ip"
-                        className={styles.selectInput}
-                        value={founderB.ip}
-                        onChange={(e) => setFounderB({ ...founderB, ip: e.target.value })}
-                      >
-                        <option value="0">None (Just starting out)</option>
-                        <option value="1">Basic designs / technical specifications</option>
-                        <option value="2">Ready-made codebase / system core</option>
-                        <option value="3">Patented tech / core proprietary system</option>
-                      </select>
-                    </div>
-
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fb-domain">Domain Expertise &amp; Warm Network</label>
-                      <select 
-                        id="fb-domain"
-                        className={styles.selectInput}
-                        value={founderB.domainExpertise}
-                        onChange={(e) => setFounderB({ ...founderB, domainExpertise: e.target.value })}
-                      >
-                        <option value="1">General software developer</option>
-                        <option value="2">5+ years general stack experience</option>
-                        <option value="3">10+ years architect with specific domain match</option>
-                      </select>
-                    </div>
-
-                    <div className={styles.fieldGroup}>
-                      <label htmlFor="fb-role">Expected Execution Weight</label>
-                      <select 
-                        id="fb-role"
-                        className={styles.selectInput}
-                        value={founderB.roleWeight}
-                        onChange={(e) => setFounderB({ ...founderB, roleWeight: e.target.value })}
-                      >
-                        <option value="0.4">Supporting developer (Builds task tickets)</option>
-                        <option value="0.6">Lead Tech CTO (Designs and codes full product)</option>
-                        <option value="0.8">CTO &amp; Architect (Owns complete technical risk)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.actionBar}>
-                  <button onClick={() => setStep(1)} className="btn btn-outline">
-                    <ArrowLeft size={16} /> Back
-                  </button>
-                  <button onClick={() => setStep(3)} className="btn btn-primary">
-                    Calculate Split <Sparkles size={16} />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 3: RESULTS DISPLAY & VESTING SCHEDULER */}
-            {step === 3 && (
-              <div>
-                <h2 className={styles.sectionTitle}>
-                  <Scale size={22} style={{ color: 'var(--color-primary)' }} />
-                  Step 3: Recommended Equity Split
+                  <PieChart size={22} style={{ color: 'var(--color-primary)' }} />
+                  Step 2: Recommended Split Results
                 </h2>
 
                 <div className={styles.resultsContainer}>
-                  {/* Visual Pie Legend */}
+                  {/* Circular Pie Chart */}
                   <div className={styles.pieContainer}>
                     <div className={styles.visualSplit}>
                       <svg viewBox="0 0 36 36" className={styles.circularChart}>
@@ -426,7 +579,6 @@ export default function EquityCalculatorPage() {
                             a 15.9155 15.9155 0 0 1 0 31.831
                             a 15.9155 15.9155 0 0 1 0 -31.831"
                         />
-                        {/* Circle segment for Founder A */}
                         <path
                           className={styles.circleVal}
                           strokeDasharray={`${splitA}, 100`}
@@ -434,7 +586,6 @@ export default function EquityCalculatorPage() {
                             a 15.9155 15.9155 0 0 1 0 31.831
                             a 15.9155 15.9155 0 0 1 0 -31.831"
                         />
-                        {/* Circle segment for Founder B */}
                         <path
                           className={styles.circleValB}
                           strokeDasharray={`${splitB}, 100`}
@@ -454,68 +605,94 @@ export default function EquityCalculatorPage() {
                       <div className={styles.legendItem}>
                         <span className={styles.legendLabel}>
                           <span className={styles.legendColor} style={{ background: 'var(--color-primary)' }} />
-                          {founderA.name}
+                          {modelMode === 'slicing-pie' ? pieA.name : pointsA.name}
                         </span>
                         <span className={styles.legendValue}>{splitA}%</span>
                       </div>
                       <div className={styles.legendItem}>
                         <span className={styles.legendLabel}>
                           <span className={styles.legendColor} style={{ background: 'var(--color-secondary)' }} />
-                          {founderB.name}
+                          {modelMode === 'slicing-pie' ? pieB.name : pointsB.name}
                         </span>
                         <span className={styles.legendValue}>{splitB}%</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Calculations Details */}
+                  {/* Details and Description */}
                   <div className={styles.splitDetails}>
-                    <div className={styles.explanationBox}>
-                      <h4>Calculation Methodology</h4>
-                      <p>
-                        This recommendation is based on a weighted scoring model: 40% on time commitment, 
-                        15% on cash capital, 15% on prior IP, 15% on domain network/expertise, and 15% on 
-                        execution role weight.
-                      </p>
-                    </div>
+                    {modelMode === 'slicing-pie' ? (
+                      <div className={styles.explanationBox}>
+                        <h4>Slicing Pie Model (Dynamic) Math Breakdown</h4>
+                        <p style={{ marginBottom: 10 }}>
+                          Multipliers are applied to account for the risk of unpaid inputs:
+                        </p>
+                        <ul style={{ paddingLeft: 20, fontSize: '0.88rem', color: 'var(--color-text-secondary)', listStyleType: 'disc' }}>
+                          <li>**Time worked** is multiplied by **2x** to calculate Non-Cash slices.</li>
+                          <li>**Cash contributed** is multiplied by **4x** to calculate Cash slices.</li>
+                          <li>**Founder A Slices:** {(pieA.hours * pieA.rate * 2) + (pieA.cash * 4)} slices</li>
+                          <li>**Founder B Slices:** {(pieB.hours * pieB.rate * 2) + (pieB.cash * 4)} slices</li>
+                        </ul>
+                      </div>
+                    ) : (
+                      <div className={styles.explanationBox}>
+                        <h4>HBS Wasserman Framework Math Breakdown</h4>
+                        <p style={{ marginBottom: 10 }}>
+                          Weighted averages are calculated using the following criteria:
+                        </p>
+                        <ul style={{ paddingLeft: 20, fontSize: '0.88rem', color: 'var(--color-text-secondary)', listStyleType: 'disc' }}>
+                          <li>**Idea &amp; Vision:** weighted at 10%</li>
+                          <li>**Commitment &amp; Risk:** weighted at 30%</li>
+                          <li>**Execution &amp; Tech:** weighted at 30%</li>
+                          <li>**Domain Expertise &amp; IP:** weighted at 15%</li>
+                          <li>**BizDev &amp; Sales:** weighted at 15%</li>
+                        </ul>
+                      </div>
+                    )}
 
                     <div className={styles.explanationBox} style={{ borderLeftColor: 'var(--color-secondary)' }}>
                       <h4>Pomegroup Studio Alternative</h4>
                       <p>
-                        Instead of risking co-founder disputes, Pomegroup acts as your technical infrastructure 
-                        partner. You maintain **65% equity**, and Pomegroup takes **35% equity** to handle 
-                        100% of software engineering, design, and hosting.
+                        Rather than arguing over who builds what, Pomegroup acts as your second co-founder. 
+                        You keep **65% equity** to focus on domain validation, while Pomegroup takes **35% equity** 
+                        to build, scale, and host your entire technical infrastructure.
                       </p>
                     </div>
 
                     <div style={{ display: 'flex', gap: 12 }}>
-                      <button onClick={() => setStep(2)} className="btn btn-outline">
+                      <button onClick={() => setStep(1)} className="btn btn-outline">
                         <ArrowLeft size={16} /> Adjust Inputs
                       </button>
-                      <a href="#leads" className="btn btn-primary">
-                        Get Custom PDF Report
-                      </a>
+                      <button onClick={() => setStep(3)} className="btn btn-primary">
+                        Configure Vesting <ArrowRight size={16} />
+                      </button>
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
 
-                {/* Vesting Scheduler section */}
-                <div className={styles.vestingBox}>
-                  <h3 className={styles.vestingTitle}>
-                    <Lock size={20} />
-                    Dynamic Vesting Timeline Scheduler
-                  </h3>
-                  <p style={{ fontSize: '0.92rem', color: 'var(--color-text-secondary)', marginBottom: 20 }}>
-                    Vesting protects both co-founders by ensuring equity is earned over time. Adjust parameters below to visualize the vesting schedule.
+            {/* STEP 3: VESTING SCHEDULER */}
+            {step === 3 && (
+              <div>
+                <h2 className={styles.sectionTitle}>
+                  <Lock size={22} style={{ color: 'var(--color-primary)' }} />
+                  Step 3: Vesting &amp; Shareholders Protection
+                </h2>
+
+                <div className={styles.vestingBox} style={{ border: 'none', padding: 0 }}>
+                  <p style={{ fontSize: '0.92rem', color: 'var(--color-text-secondary)', marginBottom: 30 }}>
+                    Vesting ensures that co-founders earn their equity over time. If a partner leaves early, 
+                    unvested shares are bought back by the company, preventing dead equity bottlenecks.
                   </p>
 
                   <div className={styles.vestingControls}>
                     <div className={styles.fieldGroup}>
-                      <label htmlFor="vesting-years">Vesting Schedule (Years)</label>
+                      <label htmlFor="vest-yrs">Vesting Schedule (Years)</label>
                       <div className={styles.rangeSliderContainer}>
                         <input 
                           type="range" 
-                          id="vesting-years"
+                          id="vest-yrs"
                           min="1" 
                           max="6" 
                           className={styles.slider}
@@ -527,11 +704,11 @@ export default function EquityCalculatorPage() {
                     </div>
 
                     <div className={styles.fieldGroup}>
-                      <label htmlFor="cliff-months">Cliff Period (Months)</label>
+                      <label htmlFor="cliff-mos">Cliff Period (Months)</label>
                       <div className={styles.rangeSliderContainer}>
                         <input 
                           type="range" 
-                          id="cliff-months"
+                          id="cliff-mos"
                           min="0" 
                           max="24" 
                           step="6"
@@ -545,31 +722,36 @@ export default function EquityCalculatorPage() {
                   </div>
 
                   <div className={styles.timelineVisual}>
-                    {/* Cliff shade */}
                     <div 
                       className={styles.cliffSegment} 
                       style={{ width: `${(cliffMonths / (vestingYears * 12)) * 100}%` }}
                     />
-                    
-                    {/* Vesting fill */}
                     <div className={styles.vestingProgress} style={{ width: '100%' }} />
 
-                    {/* Timeline labels */}
-                    <span className={styles.timelineLabel} style={{ left: '0%' }}>Start</span>
+                    <span className={styles.timelineLabel} style={{ left: '0%' }}>Incorporation</span>
                     {cliffMonths > 0 && (
                       <span className={styles.timelineLabel} style={{ left: `${(cliffMonths / (vestingYears * 12)) * 100}%` }}>
                         Cliff ({cliffMonths}m)
                       </span>
                     )}
-                    <span className={styles.timelineLabel} style={{ left: '100%' }}>End ({vestingYears} yrs)</span>
+                    <span className={styles.timelineLabel} style={{ left: '100%' }}>Fully Vested ({vestingYears}y)</span>
                   </div>
 
-                  <div style={{ marginTop: 24, fontSize: '0.85rem', color: 'var(--color-muted)', display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div style={{ marginTop: 40, fontSize: '0.85rem', color: 'var(--color-muted)', display: 'flex', gap: 12, alignItems: 'center' }}>
                     <AlertCircle size={16} style={{ color: 'var(--color-secondary)' }} />
                     <span>
-                      Standard schedule is 4 years with a 12-month cliff. If a co-founder leaves before the cliff, they receive 0% equity.
+                      Standard schedule is 4 years with a 12-month cliff. If a co-founder leaves before month 12, they walk away with 0%.
                     </span>
                   </div>
+                </div>
+
+                <div className={styles.actionBar}>
+                  <button onClick={() => setStep(2)} className="btn btn-outline">
+                    <ArrowLeft size={16} /> Back to Results
+                  </button>
+                  <a href="#leads" className="btn btn-primary">
+                    Get Custom PDF Report
+                  </a>
                 </div>
               </div>
             )}
@@ -577,18 +759,18 @@ export default function EquityCalculatorPage() {
 
           {/* Lead Capture form */}
           <div id="leads" className={styles.leadFormContainer}>
-            <h2>Download Your Custom Co-Founder Agreement Template</h2>
+            <h2>Get Your Custom Slicing Pie Excel Calculator &amp; Legal Templates</h2>
             <p>
               Enter your email below to receive a custom PDF equity valuation report, along with our 
-              legally validated shareholder and co-founder agreement template.
+              legally validated shareholder agreement template.
             </p>
 
             {submitted ? (
               <div className={styles.successState}>
                 <CheckCircle size={44} className={styles.successIcon} />
-                <h3>Report Sent Successfully!</h3>
+                <h3>Templates Sent Successfully!</h3>
                 <p style={{ color: 'rgba(255,255,255,0.9)' }}>
-                  We have emailed your custom equity split breakdown and legal templates to {email}.
+                  We have emailed your custom equity split breakdown, Slicing Pie Excel template, and shareholders agreement.
                 </p>
               </div>
             ) : (
@@ -612,7 +794,7 @@ export default function EquityCalculatorPage() {
                   aria-label="Venture Concept"
                 />
                 <button type="submit" disabled={submitting} className="btn btn-primary">
-                  {submitting ? 'Preparing PDF...' : 'Get PDF Report & Legal Templates'}
+                  {submitting ? 'Preparing PDF...' : 'Get Excel Calculator & Legal Templates'}
                 </button>
                 {errorMsg && (
                   <p style={{ color: 'var(--color-secondary)', fontSize: '0.85rem', marginTop: 10 }}>{errorMsg}</p>
