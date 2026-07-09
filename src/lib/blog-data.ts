@@ -1,6 +1,9 @@
 import { batch2Articles } from './blog-articles-batch2';
 import { batch3Articles } from './blog-articles-batch3';
 import { batch4Articles } from './blog-articles-batch4';
+import { batch6Articles } from './blog-articles-batch6';
+import { batch5Articles } from './blog-articles-batch5';
+
 
 export interface BlogArticle {
   slug: string;
@@ -480,7 +483,10 @@ The companies that treat sustainability reporting as a strategic capability — 
   ...batch2Articles,
   ...batch3Articles,
   ...batch4Articles,
+  ...batch5Articles,
+  ...batch6Articles,
 ];
+
 
 export function getArticleBySlug(slug: string): BlogArticle | undefined {
   return blogArticles.find((article) => article.slug === slug);
