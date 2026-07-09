@@ -45,22 +45,47 @@ const getMockData = () => {
 };
 
 export async function GET() {
-  // If credentials are not present or Property ID is not configured, fall back to mock data
-  if (!fs.existsSync(credentialsPath) || !fs.existsSync(tokenPath) || !GA4_PROPERTY_ID) {
+  let clientSecrets;
+  let token;
+
+  const envSecrets = process.env.GA4_CLIENT_SECRETS;
+  const envToken = process.env.GA4_TOKEN;
+
+  // Try loading from environment variables first (Production)
+  if (envSecrets && envToken) {
+    try {
+      clientSecrets = JSON.parse(envSecrets).installed || JSON.parse(envSecrets);
+      token = JSON.parse(envToken);
+    } catch (e) {
+      console.error('Failed to parse GA4 environment variables:', e);
+    }
+  }
+
+  // Fallback to local files if environment variables are not available (Development)
+  if (!clientSecrets || !token) {
+    if (fs.existsSync(credentialsPath) && fs.existsSync(tokenPath)) {
+      try {
+        clientSecrets = JSON.parse(fs.readFileSync(credentialsPath, 'utf8')).installed;
+        token = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
+      } catch (e) {
+        console.error('Failed to read local GA4 credentials files:', e);
+      }
+    }
+  }
+
+  // Serve mock data if credentials or Property ID are missing
+  if (!clientSecrets || !token || !GA4_PROPERTY_ID) {
     console.log('📊 GA4 credentials or Property ID not set. Serving mock dashboard data.');
     return NextResponse.json(getMockData());
   }
 
   try {
-    const clientSecrets = JSON.parse(fs.readFileSync(credentialsPath, 'utf8')).installed;
-    const token = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
-
     // Initialize GA4 Data API client using unified OAuth credentials
     const client = new BetaAnalyticsDataClient({
       credentials: {
         type: 'authorized_user',
-        client_id: clientSecrets.client_id,
-        client_secret: clientSecrets.client_secret,
+        client_id: clientSecrets.client_id || clientSecrets.installed?.client_id,
+        client_secret: clientSecrets.client_secret || clientSecrets.installed?.client_secret,
         refresh_token: token.refresh_token,
       }
     });

@@ -37,6 +37,7 @@ export async function POST(request: Request) {
         BASE_URL,
         `${BASE_URL}/blog`,
         `${BASE_URL}/resources`,
+        `${BASE_URL}/resources/equity-calculator`,
         `${BASE_URL}/co-build`,
         ...blogArticles.map((article) => `${BASE_URL}/blog/${article.slug}`),
       ];
@@ -45,6 +46,8 @@ export async function POST(request: Request) {
     urlsToSubmit = [
       BASE_URL,
       `${BASE_URL}/blog`,
+      `${BASE_URL}/resources`,
+      `${BASE_URL}/resources/equity-calculator`,
       ...blogArticles.map((article) => `${BASE_URL}/blog/${article.slug}`),
     ];
   }
