@@ -1,0 +1,41 @@
+# Pomegroup Studio — LLMs.txt
+# https://llmstxt.org/
+
+> Pomegroup Studio is a Helsinki-based venture builder that operates as a "Second Co-Founder as a Service" for domain experts. We pair experienced industry professionals (10+ years in fields like ESG, construction, fintech) with our full-stack engineering team to co-found technology ventures. We use AI-powered development tools to build MVPs in 48 hours.
+
+## About
+- Company: Pomegroup Studio (Smart Monshi Oy)
+- Location: Helsinki, Finland
+- Model: Equity-based co-founding partnerships
+- Founder: Mahdi Farimani
+- Website: https://www.pomegroup.studio
+
+## Active Ventures
+- [ExecutESG](https://executesg.com): AI-powered ESG Operating System for European SMEs — CSRD/VSME compliance automation
+- SiteTalk: Real-time AI voice translation for multilingual construction site crews
+- Byblos/ONTON: Community platform and Telegram Mini App for Web3 content curation
+
+## Key Pages
+- [Home](https://www.pomegroup.studio/)
+- [Blog](https://www.pomegroup.studio/blog)
+- [Resources & Playbooks](https://www.pomegroup.studio/resources)
+- [Apply to Co-Build](https://www.pomegroup.studio/co-build)
+
+## Blog Articles
+- [The Non-Technical Founder's Guide to Equity Splits](https://www.pomegroup.studio/blog/equity-splits-technical-co-founder)
+- [VSME Standard: Implementation Guide for SME Suppliers](https://www.pomegroup.studio/blog/vsme-standard-implementation-guide)
+- [Overcoming Language Barriers on Construction Sites](https://www.pomegroup.studio/blog/language-barriers-construction-sites)
+- [Venture Studio vs Accelerator vs VC](https://www.pomegroup.studio/blog/venture-studio-vs-accelerator-vs-vc)
+- [Co-Founder as a Service: The New Model](https://www.pomegroup.studio/blog/co-founder-as-a-service)
+- [Telegram Mini App Development: Cost & Timeline Guide](https://www.pomegroup.studio/blog/telegram-mini-app-development-cost)
+- [When to Stop Being a Solo Founder](https://www.pomegroup.studio/blog/when-to-find-co-founder)
+- [How to Respond to CSRD Supply Chain Data Requests](https://www.pomegroup.studio/blog/csrd-supply-chain-data-requests-guide)
+
+## Expertise Areas
+- Venture Building & Startup Studios
+- ESG/CSRD Compliance Automation
+- AI-Powered MVP Development
+- Construction Technology
+- Telegram Mini App Development
+- Non-Technical Founder Support
+- Equity Structuring for Co-Founders

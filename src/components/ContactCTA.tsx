@@ -15,8 +15,8 @@ export default function ContactCTA() {
           — not just advises — I&apos;d love to hear from you.
         </p>
         <div className={styles.actions}>
-          <a href="mailto:Admin@pomegroup.studio" className="btn btn-primary">
-            Admin@pomegroup.studio
+          <a href="/co-build" className="btn btn-primary">
+            Apply to Co-Build
           </a>
           <a
             href="https://linkedin.com/in/mfarimani"

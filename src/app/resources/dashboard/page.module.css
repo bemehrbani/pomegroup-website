@@ -1,0 +1,309 @@
+.main {
+  padding-top: 120px; /* Offset for floating navbar */
+  min-height: 80vh;
+  background-color: var(--color-background);
+}
+
+.dashboardContainer {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 40px 24px 100px;
+}
+
+/* Header & Badges */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.header h1 {
+  color: var(--color-primary);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  letter-spacing: -0.02em;
+}
+
+.badgeContainer {
+  display: flex;
+  gap: 12px;
+}
+
+.liveBadge {
+  background: #ECFDF5;
+  color: #059669;
+  border: 1px solid #A7F3D0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+}
+
+.mockBadge {
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+}
+
+/* Key Metrics Cards */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.metricCard {
+  background: var(--color-white);
+  padding: 28px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.metricCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metricLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.metricValue {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.metricTrend {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+/* Middle Section: Funnel & Channels */
+.twoColGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 992px) {
+  .twoColGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionBox {
+  background: var(--color-white);
+  padding: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionBox h2 {
+  color: var(--color-primary);
+  font-size: 1.3rem;
+  margin-bottom: 24px;
+  position: relative;
+  display: inline-block;
+}
+
+.sectionBox h2::after {
+  content: '';
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: var(--color-secondary);
+  margin-top: 6px;
+}
+
+/* Channels List */
+.channelRow {
+  margin-bottom: 20px;
+}
+
+.channelRow:last-child {
+  margin-bottom: 0;
+}
+
+.channelMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.channelName {
+  color: var(--color-text);
+}
+
+.channelValue {
+  color: var(--color-muted);
+}
+
+.progressBarBg {
+  background: var(--color-surface);
+  height: 8px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressBarFill {
+  background: var(--color-secondary);
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.8s ease-in-out;
+}
+
+/* Conversion Funnel */
+.funnelContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.funnelBar {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--color-primary);
+  justify-content: space-between;
+  transition: transform var(--transition-fast);
+}
+
+.funnelBar:hover {
+  transform: translateX(4px);
+}
+
+.funnelStep {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.funnelStats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.funnelCount {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.funnelPercentage {
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--color-white);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+}
+
+/* Full Width Table Section */
+.pagesTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.pagesTable th {
+  padding: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.pagesTable td {
+  padding: 16px;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pagesTable tr:hover td {
+  background: var(--color-surface);
+}
+
+.pathCol {
+  font-family: monospace;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+}
+
+.viewsCol {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Guide Alert Banner (Sandbox Sandbox Instructions) */
+.guideBanner {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  padding: 28px;
+  border-radius: var(--radius-md);
+  margin-top: 48px;
+}
+
+.guideBanner h3 {
+  color: #1E40AF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 1.15rem;
+}
+
+.guideBanner p {
+  color: #1E3A8A;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  max-width: 100%;
+}
+
+.codeBlock {
+  background: #111827;
+  color: #F9FAFB;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}

@@ -57,6 +57,33 @@ export default function RootLayout({
             gtag('config', '${GA_MEASUREMENT_ID}');
           `}
         </Script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Pomegroup Studio",
+              "legalName": "Smart Monshi Oy",
+              "url": "https://www.pomegroup.studio",
+              "logo": "https://www.pomegroup.studio/images/logo-horizontal.png",
+              "founder": {
+                "@type": "Person",
+                "name": "Mahdi Farimani"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Saariselänkuja 2 D 51",
+                "addressLocality": "Helsinki",
+                "postalCode": "00970",
+                "addressCountry": "FI"
+              },
+              "sameAs": [
+                "https://www.linkedin.com/in/mahdifarimani/"
+              ]
+            })
+          }}
+        />
       </head>
       <body className={inter.variable}>{children}</body>
     </html>

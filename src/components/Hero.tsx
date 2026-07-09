@@ -16,7 +16,7 @@ export default function Hero() {
             zero to one and beyond.
           </p>
           <div className={styles.actions}>
-            <a href="#contact" className="btn btn-primary">
+            <a href="/co-build" className="btn btn-primary">
               Let&apos;s Build Together
             </a>
             <a href="#ventures" className="btn btn-outline">

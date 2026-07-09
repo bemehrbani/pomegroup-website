@@ -8,6 +8,8 @@ import styles from './Navbar.module.css';
 const navLinks = [
   { label: 'Ventures', href: '/#ventures' },
   { label: 'How It Works', href: '/#model' },
+  { label: 'Resources', href: '/resources' },
+  { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/#founder' },
   { label: 'Contact', href: '/#contact' },
 ];
@@ -47,7 +49,7 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link href="/#contact" className="btn btn-primary" onClick={() => setMenuOpen(false)}>
+          <Link href="/co-build" className="btn btn-primary" onClick={() => setMenuOpen(false)}>
             Let&apos;s Build
           </Link>
         </div>

@@ -18,10 +18,12 @@ export default function Footer() {
           </p>
         </div>
         <div className={styles.links}>
-          <a href="#ventures">Ventures</a>
-          <a href="#model">How It Works</a>
-          <a href="#founder">About</a>
-          <a href="#contact">Contact</a>
+          <a href="/#ventures">Ventures</a>
+          <a href="/#model">How It Works</a>
+          <a href="/blog">Blog</a>
+          <a href="/resources">Resources</a>
+          <a href="/#founder">About</a>
+          <a href="/#contact">Contact</a>
         </div>
         <div className={styles.legal}>
           © {new Date().getFullYear()} Smart Monshi Oy. All rights reserved.
