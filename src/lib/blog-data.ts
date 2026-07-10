@@ -9,6 +9,7 @@ import { batch10Articles } from './blog-articles-batch10';
 import { batch9Articles } from './blog-articles-batch9';
 import { batch11Articles } from './blog-articles-batch11';
 import { batch12Articles } from './blog-articles-batch12';
+import { batch13Articles } from './blog-articles-batch13';
 
 
 export interface BlogArticle {
@@ -497,6 +498,7 @@ The companies that treat sustainability reporting as a strategic capability — 
   ...batch10Articles,
   ...batch11Articles,
   ...batch12Articles,
+  ...batch13Articles,
 ];
 
 
