@@ -29,10 +29,14 @@ function formatDate(dateStr: string): string {
 export default function BlogListingPage() {
   const [activeCategory, setActiveCategory] = useState<string>('All');
 
+  const sortedArticles = [...blogArticles].sort(
+    (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
+
   const filtered =
     activeCategory === 'All'
-      ? blogArticles
-      : blogArticles.filter((a) => a.category === activeCategory);
+      ? sortedArticles
+      : sortedArticles.filter((a) => a.category === activeCategory);
 
   return (
     <>
