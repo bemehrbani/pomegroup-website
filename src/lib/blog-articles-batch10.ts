@@ -200,7 +200,7 @@ Under Finnish law, a company must have a clear connection to the country. Busine
 This is where **Pomegroup** acts as your strategic partner. We don't just act as corporate advisors; we enter as your local co-building studio. By acting as the resident co-founder and providing dedicated CTO leadership and software engineering execution, we:
 * Validate your technology stack to satisfy Business Finland's strict scalability checks.
 * Unlock immediate access to Finnish business bank accounts by providing local board representation.
-* Co-author and manage your Business Finland Tempo grant application, securing your first €50,000 in non-dilutive capital.
+* Co-author and manage your Business Finland Sprint grant application, securing up to €100,000 in non-dilutive capital (matching €50,000 in equity).
 * Provide the software engineering muscle to build and launch your MVP in the European market.
 
 If you are ready to establish your tech startup in the world's most stable, high-tech ecosystem, let's discuss how we can build it together.`,

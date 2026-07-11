@@ -383,7 +383,7 @@ Building an ESG startup requires runway to handle complex technical development 
 
 ### 1. Non-Dilutive Government Grants
 Because governments are actively pushing the green transition, there is a massive amount of non-dilutive capital available.
-*   *In Finland/EU:* You can apply for a **Business Finland Tempo Grant** (up to €50,000 in non-dilutive funding) or R&D loans. Similar programs exist across the EU (such as Bpifrance in France).
+*   *In Finland/EU:* You can apply for a **Business Finland Sprint Grant** (up to €100,000 in non-dilutive R&D funding, requiring €50,000 in equity) or R&D loans. Similar programs exist across the EU (such as Bpifrance in France).
 
 ### 2. Institutional VCs (Impact Investors)
 Many venture capital firms now have dedicated \"Impact Funds\" that only invest in companies with a clear environmental or social mission.

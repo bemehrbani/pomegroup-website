@@ -378,7 +378,7 @@ Once Business Finland issues a positive Eligibility Statement, the hard work beg
 2.  **Move to Finland:** Once Migri issues the residence permit card, you can relocate to Finland.
 3.  **Incorporate the Company:** Register your Oy at the PRH. Remember, you will need at least one EEA resident board member (a requirement you satisfy if you are co-building with Pomegroup).
 4.  **Open a Bank Account & Register for Taxes:** Set up your banking infrastructure and tax registrations.
-5.  **Apply for Funding:** Submit your application for Business Finland's Tempo funding to accelerate your product development and market validation.
+5.  **Apply for Funding:** Submit your application for Business Finland's Sprint funding (replacing Tempo) to accelerate your product development and market validation.
 
 ---
 
