@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless';
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,37 @@ export async function POST(request: Request) {
           { success: false, error: 'Missing required application fields.' },
           { status: 400 }
         );
+      }
+    }
+
+    // Save to Neon Postgres Database if configured
+    const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+    if (connectionString) {
+      try {
+        const sql = neon(connectionString);
+        await sql`
+          INSERT INTO applications (
+            type, name, email, linkedin, domain, problem, product_description, stage, bottleneck, why_pomegroup, role, traction, idea, raw_data
+          ) VALUES (
+            ${isCalculatorLead ? 'equity_calculator' : 'co_build'},
+            ${name || null},
+            ${email},
+            ${linkedin || null},
+            ${domain || null},
+            ${problem || null},
+            ${productDescription || null},
+            ${stage || null},
+            ${bottleneck || null},
+            ${whyPomegroup || null},
+            ${role || null},
+            ${traction || null},
+            ${idea || null},
+            ${JSON.stringify(data)}
+          )
+        `;
+        console.log('Application saved to Neon Postgres successfully.');
+      } catch (dbErr) {
+        console.error('Failed to save application to Neon Postgres:', dbErr);
       }
     }
 
@@ -101,3 +133,4 @@ export async function POST(request: Request) {
     );
   }
 }
+
