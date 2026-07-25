@@ -1,0 +1,19 @@
+# Machine-readable safety gate policy for pomegroup-website
+version: 1
+
+denylist:
+  - ".env"
+  - ".env.*"
+  - "credentials/**"
+  - "**/credentials/**"
+  - "**/*_key*"
+  - "**/*_secret*"
+  - "next.config.ts"
+  - "package.json"
+
+maxFiles: 10
+
+autoMergeAllowlist:
+  - "docs/**"
+  - "**/*.md"
+  - "content/**"

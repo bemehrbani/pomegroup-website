@@ -12,24 +12,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Pomegroup Studio — Digital Venture Builder",
+  title: "Pomegroup Studio — Technical Co-Founder Studio in Finland",
   description:
-    "Helsinki-based venture builder studio. We become your second co-founder, turning domain expertise into market-ready products. AI, SaaS, Web3, and mobile development.",
+    "Helsinki-based technical co-founder & venture builder studio. We partner with domain experts in Finland and Europe as CTO co-founders to build SaaS, AI, and ESG products.",
   keywords: [
-    "venture builder",
-    "startup studio",
+    "cofounder studio in finland",
+    "technical cofounder finland",
+    "venture studio finland",
+    "co-builder studio helsinki",
     "co-founder as a service",
-    "Helsinki",
-    "Finland",
+    "venture builder helsinki",
+    "startup studio finland",
+    "CTO as a service finland",
     "ESG",
     "AI",
     "SaaS",
-    "Web3",
   ],
   openGraph: {
-    title: "Pomegroup Studio — Digital Venture Builder",
+    title: "Pomegroup Studio — Technical Co-Founder Studio in Finland",
     description:
-      "We become your second co-founder. Helsinki-based studio turning domain expertise into market-ready products.",
+      "Your second co-founder in Finland. We turn domain expertise into market-ready SaaS, AI, and ESG products.",
     url: "https://pomegroup.studio",
     siteName: "Pomegroup Studio",
     type: "website",
